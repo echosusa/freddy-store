@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
-function App() {
+export default function App() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     async function fetchProducts() {
-      const { data, error } = await supabase
-        .from('product_list')
-        .select('*');
-      if (error) console.error(error);
+      const { data, error } = await supabase.from('product_list').select('*');
+      if (error) console.error('Error loading products:', error);
       else setProducts(data);
     }
+
     fetchProducts();
   }, []);
 
@@ -21,9 +20,8 @@ function App() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
         {products.map(product => (
           <div key={product.id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem' }}>
-            {/* Galería de fotos */}
             <div style={{ display: 'flex', overflowX: 'scroll', gap: '0.5rem', marginBottom: '1rem' }}>
-              {product.photo_urls?.map((url, index) => (
+              {JSON.parse(product.photo_urls).map((url, index) => (
                 <img
                   key={index}
                   src={url}
@@ -41,5 +39,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
