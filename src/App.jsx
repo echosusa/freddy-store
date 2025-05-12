@@ -10,7 +10,6 @@ export default function App() {
       if (error) console.error('Error loading products:', error);
       else setProducts(data);
     }
-
     fetchProducts();
   }, []);
 
@@ -18,23 +17,33 @@ export default function App() {
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>Product Catalog</h1>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-        {products.map(product => (
-          <div key={product.id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem' }}>
-            <div style={{ display: 'flex', overflowX: 'scroll', gap: '0.5rem', marginBottom: '1rem' }}>
-              {JSON.parse(product.photo_urls).map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`${product.name} ${index + 1}`}
-                  style={{ height: '150px', borderRadius: '4px' }}
-                />
-              ))}
+        {products.map(product => {
+          let photos = [];
+          try {
+            photos = JSON.parse(product.photo_urls);
+          } catch (e) {
+            console.warn(`Invalid photo_urls for product ${product.name}`);
+          }
+
+          return (
+            <div key={product.id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ display: 'flex', overflowX: 'auto', gap: '0.5rem', marginBottom: '1rem' }}>
+                {Array.isArray(photos) &&
+                  photos.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt={`${product.name} ${index + 1}`}
+                      style={{ height: '150px', borderRadius: '4px' }}
+                    />
+                  ))}
+              </div>
+              <h2>{product.name}</h2>
+              <p style={{ fontSize: '0.9rem', color: '#555' }}>{product.short_description}</p>
+              <p style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>${product.price}</p>
             </div>
-            <h2>{product.name}</h2>
-            <p style={{ fontSize: '0.9rem', color: '#555' }}>{product.short_description}</p>
-            <p style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>${product.price}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
